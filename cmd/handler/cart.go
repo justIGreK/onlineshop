@@ -24,10 +24,13 @@ func (h *Handler) checkCart(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	c.JSON(http.StatusOK, checkCart{
-		Data: cartItems,
-	})
+	if cartItems == nil {
+		c.JSON(http.StatusOK, "your cart is empty")
+	} else {
+		c.JSON(http.StatusOK, checkCart{
+			Data: cartItems,
+		})
+	}
 
 }
 
@@ -73,11 +76,9 @@ func (h *Handler) makeOrder(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	
 
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "order is created",
 	})
-
 
 }

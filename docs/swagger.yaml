@@ -1,21 +1,37 @@
 basePath: /
 definitions:
-  handler.errorResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  models.User:
+  handler.changeBalance:
     properties:
       balance:
         type: integer
-      id:
-        type: integer
-      is_active:
-        type: boolean
+    type: object
+  handler.deleteAccount:
+    properties:
       login:
         type: string
       password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  handler.signInInput:
+    properties:
+      login:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  handler.signUp:
+    properties:
+      login:
+        type: string
+      password:
+        minLength: 6
         type: string
     required:
     - login
@@ -25,38 +41,84 @@ host: localhost:8080
 info:
   contact: {}
   description: API Server for Online Shop Application
-  title: Todo App API
+  title: onlineShop App API
   version: "1.0"
 paths:
   /api/users/:
     get:
-      consumes:
-      - application/json
       description: get list of users
+      parameters:
+      - description: Authentication Token
+        in: header
+        name: X-Auth-Token
+        required: true
+        type: string
       produces:
       - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
+      responses: {}
+      security:
+      - BearerAuth: []
       summary: Get Userlist
+      tags:
+      - users
+  /api/users/:id:
+    delete:
+      consumes:
+      - application/json
+      description: delete user or change user acc to inactive
+      parameters:
+      - description: User data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.deleteAccount'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - users
+    get:
+      description: get user by id
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Get User
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: update balance of user
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: NewBalance
+        in: body
+        name: balance
+        required: true
+        schema:
+          $ref: '#/definitions/handler.changeBalance'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Update user
       tags:
       - users
   /auth/sign-in:
@@ -70,30 +132,10 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/handler.signInInput'
       produces:
       - application/json
-      responses:
-        "200":
-          description: token
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
+      responses: {}
       summary: SignIn
       tags:
       - auth
@@ -103,41 +145,16 @@ paths:
       - application/json
       description: create account
       parameters:
-      - description: account info
+      - description: reg input
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/handler.signUp'
       produces:
       - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
+      responses: {}
       summary: SignUp
       tags:
       - auth
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

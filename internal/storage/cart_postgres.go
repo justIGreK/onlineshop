@@ -26,7 +26,7 @@ func (c *CartPostgres) CreateCart(user_id int, product_id int, quantity int, pri
 
 func (c *CartPostgres) GetCart(user_id int) ([]models.GetCart, error) {
 	var cartItems []models.GetCart
-	query := fmt.Sprintf("SELECT product_id, quantity FROM %s WHERE user_id=$1", cartTable)
+	query := fmt.Sprintf("SELECT product_id, quantity, price FROM %s WHERE user_id=$1", cartTable)
 
 	err := c.db.Select(&cartItems, query, user_id)
 
@@ -67,7 +67,4 @@ func (c *CartPostgres) DeleteCartByProduct(userID int, productID int)(error){
 	
 }
 
-func(c *CartPostgres) PrepareToOrder(userID int)error {
 
-	return nil
-}

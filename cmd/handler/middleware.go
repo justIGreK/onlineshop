@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -15,6 +16,7 @@ const (
 
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
+	fmt.Println(header)
 	if header == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
 		return
@@ -36,7 +38,7 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	if !user.IsActice{
+	if !user.IsActice {
 		newErrorResponse(c, http.StatusUnauthorized, "This token of banned or deleted user")
 	}
 

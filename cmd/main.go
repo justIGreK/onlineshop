@@ -11,14 +11,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-// @title Todo App API
+// @title onlineShop App API
 // @version 1.0
 // @description API Server for Online Shop Application
 
 // @host localhost:8080
 // @BasePath /
 
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.bearer BearerAuth
 // @in header
 // @name Authorization
 
@@ -51,5 +51,3 @@ func main() {
 	}
 
 }
-
-

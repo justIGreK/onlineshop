@@ -30,10 +30,10 @@ type Cart interface {
 	GetCart(id int) ([]models.GetCart, error)
 	AddProductToCart(user_id int, product_id int, quantity int) error
 	MakeOrder(user_id int) error
+	RandomDiscount() int
 }
 
-type Order interface{
-
+type Order interface {
 }
 
 type Service struct {
@@ -50,5 +50,6 @@ func NewService(store *storage.Store) *Service {
 		Product:       NewProdService(store.Product),
 		UserList:      NewUserService(store.UserList),
 		Cart:          NewCartService(store.Cart, store.Product),
+		Order:         NewOrderService(store.Order),
 	}
 }

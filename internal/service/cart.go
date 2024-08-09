@@ -56,8 +56,9 @@ func (c *CartService) AddProductToCart(user_id int, product_id int, quantity int
 			return fmt.Errorf("adding to cart got problem:%w", err)
 		}
 	}
-
+	
 	dif := cart.Quantity + quantity
+	
 	if dif < 0 {
 		return errors.New("you cant make quantity of product below zero")
 	}
@@ -97,12 +98,14 @@ func (c *CartService) MakeOrder(userID int) error {
 		if newerr != nil {
 			return fmt.Errorf("cant check for amount of produnt in storage:%w", err)
 		}
-		if cartItem.Quantity > product.Amount {
+		if cartItem.Quantity > product.Amount{
 			return errors.New("the requested quantity of products is greater than the quantity of products in stock")
 		}
 	}
 
+	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaaa")
 	user, err := c.userStore.GetUserById(userID)
+	fmt.Println("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs")
 	if err != nil {
 		return fmt.Errorf("we cant check yout balance because of this problem: %w", err)
 	}
@@ -111,13 +114,13 @@ func (c *CartService) MakeOrder(userID int) error {
 		return errors.New(newerr)
 	}
 
-	err = c.orderStore.MakeOrder(userID, cart, totalPrice, c.RandomDiscount())
-
+	err = c.orderStore.CreateOrder(userID, cart, totalPrice, c.RandomDiscount())
+	if err !=nil {
+		return fmt.Errorf("error during making order: %w", err)
+	}
 	return nil
 }
 
 func (c *CartService) RandomDiscount() int {
-
-	return rand.Intn(15)
-
+	return rand.Intn(15)	
 }

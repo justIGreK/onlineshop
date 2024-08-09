@@ -37,7 +37,8 @@ type Product interface {
 	UpdateProduct(id int, product models.UpdateProduct) error
 }
 type Order interface {
-	MakeOrder(userID int, cart []models.GetCart, totalPrice float64, discount int) error
+	CreateOrder(userID int, cart []models.GetCart, totalPrice float64, discount int) error
+	CreateOrderItems(orderID int, cart []models.GetCart) error
 }
 type Store struct {
 	Authorization

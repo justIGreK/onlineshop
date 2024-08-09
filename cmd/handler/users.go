@@ -22,14 +22,11 @@ type deleteAccount struct {
 }
 
 // @Summary Get Userlist
+// @Security BearerAuth
 // @Tags users
 // @Description get list of users
-// @Accept  json
+// @Param X-Auth-Token header string true "Authentication Token"
 // @Produce  json
-// @Success 200 {object} errorResponse
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
 // @Router /api/users/ [get]
 func (h *Handler) getUserList(c *gin.Context) {
 	users, err := h.services.UserList.GetUsersList()
@@ -44,17 +41,12 @@ func (h *Handler) getUserList(c *gin.Context) {
 }
 
 // @Summary Get User
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Tags users
 // @Description get user by id
-// @Accept  json
+// @Param id path int  true  "Account ID"
 // @Produce  json
-// @Success 200 {object} errorResponse
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
 // @Router /api/users/:id [get]
-
 func (h *Handler) getUser(c *gin.Context) {
 	searchId := c.Param("id")
 	id, err := strconv.Atoi(searchId)
@@ -78,17 +70,14 @@ func (h *Handler) getUser(c *gin.Context) {
 }
 
 // @Summary Update user
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Tags users
 // @Description update balance of user
+// @Param id path int  true  "Account ID"
+// @Param balance body changeBalance true "NewBalance"
 // @Accept  json
 // @Produce  json
-// @Success 200 {statusResponse} getAllListsResponse
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
 // @Router /api/users/:id [put]
-
 func (h *Handler) changeBalance(c *gin.Context) {
 	var changeBalance changeBalance
 	userid, err := getUserId(c)
@@ -126,6 +115,14 @@ func (h *Handler) changeBalance(c *gin.Context) {
 
 }
 
+// @Summary Delete user
+// @Security BearerAuth
+// @Tags users
+// @Description delete user or change user acc to inactive
+// @Param data body deleteAccount true "User data"
+// @Accept  json
+// @Produce  json
+// @Router /api/users/:id [delete]
 func (h *Handler) deleteUser(c *gin.Context) {
 	var userInfo deleteAccount
 	userId, err := getUserId(c)

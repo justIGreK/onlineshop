@@ -16,11 +16,7 @@ type signUp struct {
 // @Description create account
 // @Accept  json
 // @Produce  json
-// @Param input body models.User true "account info"
-// @Success 200 {object} integer
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
+// @Param input body signUp true "reg input" 
 // @Router /auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var input signUp
@@ -51,11 +47,7 @@ type signInInput struct {
 // @Description login
 // @Accept  json
 // @Produce  json
-// @Param input body models.User true "account info"
-// @Success 200 {object} string "token"
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
+// @Param input body signInInput true "account info"
 // @Router /auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
