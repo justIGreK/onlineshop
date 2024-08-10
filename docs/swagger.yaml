@@ -1,9 +1,34 @@
 basePath: /
 definitions:
+  handler.addProduct:
+    properties:
+      amount:
+        type: integer
+      cost:
+        type: number
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - amount
+    - cost
+    - name
+    type: object
+  handler.addProductToCart:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
   handler.changeBalance:
     properties:
       balance:
-        type: integer
+        type: number
     type: object
   handler.deleteAccount:
     properties:
@@ -37,6 +62,17 @@ definitions:
     - login
     - password
     type: object
+  models.UpdateProduct:
+    properties:
+      amount:
+        type: integer
+      cost:
+        type: number
+      description:
+        type: string
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -44,24 +80,146 @@ info:
   title: onlineShop App API
   version: "1.0"
 paths:
-  /api/users/:
+  /api/cart/:
     get:
-      description: get list of users
-      parameters:
-      - description: Authentication Token
-        in: header
-        name: X-Auth-Token
-        required: true
-        type: string
+      consumes:
+      - application/json
+      description: get cart by your id from database
       produces:
       - application/json
       responses: {}
       security:
       - BearerAuth: []
-      summary: Get Userlist
+      summary: Check your cart
       tags:
-      - users
-  /api/users/:id:
+      - cart
+  /api/cart/add:
+    post:
+      consumes:
+      - application/json
+      description: add product to your cart by id and amount of product
+      parameters:
+      - description: NewProduct
+        in: body
+        name: balance
+        required: true
+        schema:
+          $ref: '#/definitions/handler.addProductToCart'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Add product to your cart
+      tags:
+      - cart
+  /api/cart/order:
+    post:
+      consumes:
+      - application/json
+      description: create order from your cart
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Make order
+      tags:
+      - cart
+  /api/products/:
+    get:
+      consumes:
+      - application/json
+      description: get product list from database
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Get productlist
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: add product to database
+      parameters:
+      - description: NewProduct
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/handler.addProduct'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Add product
+      tags:
+      - products
+  /api/products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete product by id from database
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Delete product by id
+      tags:
+      - products
+    get:
+      consumes:
+      - application/json
+      description: get product by id from database
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Get product by id
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: change name, cost or amount of product from database
+      parameters:
+      - description: NewProduct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateProduct'
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Change info about product
+      tags:
+      - products
+  /api/users/:
     delete:
       consumes:
       - application/json
@@ -81,6 +239,17 @@ paths:
       summary: Delete user
       tags:
       - users
+    get:
+      description: get list of users
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Get Userlist
+      tags:
+      - users
+  /api/users/{id}:
     get:
       description: get user by id
       parameters:
@@ -157,4 +326,9 @@ paths:
       summary: SignUp
       tags:
       - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

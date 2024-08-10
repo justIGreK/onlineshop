@@ -5,5 +5,5 @@ db:
   port: "5555"
   username: "postgres"
   password: "secret"
-  dbname: "shopdb"
+  dbname: "postgres"
   sslmode: "disable"

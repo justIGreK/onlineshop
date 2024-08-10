@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -16,7 +15,7 @@ const (
 
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
-	fmt.Println(header)
+
 	if header == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
 		return

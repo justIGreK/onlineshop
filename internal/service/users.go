@@ -32,7 +32,7 @@ func (u *UserService) GetUserById(id int) (models.User, error) {
 	return user, nil
 }
 
-func (u *UserService) ChangeBalance(id int, changeBalance int) error {
+func (u *UserService) ChangeBalance(id int, changeBalance float64) error {
 	err := u.store.UpdateUserBalance(id, changeBalance)
 	if err != nil {
 		return fmt.Errorf("the balance has not been updated due to this error: %w", err)

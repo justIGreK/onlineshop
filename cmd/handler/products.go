@@ -15,6 +15,14 @@ type addProduct struct{
 	Amount int `json:"amount" binding:"required,gt=0"`
 	
 }
+// @Summary Add product
+// @Security BearerAuth
+// @Tags products
+// @Description add product to database
+// @Param product body addProduct true "NewProduct"
+// @Accept  json
+// @Produce  json
+// @Router /api/products/ [post]
 func (h *Handler) addProduct(c *gin.Context) {
 	var input addProduct
 
@@ -41,7 +49,13 @@ func (h *Handler) addProduct(c *gin.Context) {
 type getProductListResponse struct {
 	Data []models.Product `json:"data"`
 }
-
+// @Summary Get productlist
+// @Security BearerAuth
+// @Tags products
+// @Description get product list from database
+// @Accept  json
+// @Produce  json
+// @Router /api/products/ [get]
 func (h *Handler) getProductList(c *gin.Context) {
 	products, err := h.services.Product.GetProductList()
 	if err != nil {
@@ -53,7 +67,14 @@ func (h *Handler) getProductList(c *gin.Context) {
 	})
 
 }
-
+// @Summary Get product by id
+// @Security BearerAuth
+// @Tags products
+// @Description get product by id from database
+// @Param id path int  true  "Product ID"
+// @Accept  json
+// @Produce  json
+// @Router /api/products/{id} [get]
 func (h *Handler) getProduct(c *gin.Context) {
 	searchId := c.Param("id")
 	id, err := strconv.Atoi(searchId)
@@ -75,7 +96,15 @@ func (h *Handler) getProduct(c *gin.Context) {
 		Amount:      product.Amount,
 	})
 }
-
+// @Summary  Change info about product
+// @Security BearerAuth
+// @Tags products
+// @Description change name, cost or amount of product from database
+// @Param data body models.UpdateProduct true "NewProduct"
+// @Param id path int  true  "Product ID"
+// @Accept  json
+// @Produce  json
+// @Router /api/products/{id} [put]
 func (h *Handler) changeProduct(c *gin.Context) {
 
 	var inputProduct models.UpdateProduct
@@ -105,7 +134,14 @@ func (h *Handler) changeProduct(c *gin.Context) {
 	
 
 }
-
+// @Summary Delete product by id
+// @Security BearerAuth
+// @Tags products
+// @Description delete product by id from database
+// @Param id path int  true  "Product ID"
+// @Accept  json
+// @Produce  json
+// @Router /api/products/{id} [delete]
 func (h *Handler) deleteProduct(c *gin.Context) {
 
 	deleteId := c.Param("id")

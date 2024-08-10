@@ -27,15 +27,16 @@ func (u *UsersPostgres) GetUsersList() ([]models.User, error) {
 
 func (u *UsersPostgres) GetUserById(id int) (models.User, error) {
 
-	var user models.User
-
+	var user, empty models.User
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", userTable)
 	err := u.db.Get(&user, query, id)
-
-	return user, err
+	if err != nil{
+		return empty, err
+	}
+	return user, nil
 }
 
-func (u *UsersPostgres) UpdateUserBalance(id int, changeBalance int) error {
+func (u *UsersPostgres) UpdateUserBalance(id int, changeBalance float64) error {
 	isOk, err := u.CheckForValidUpdateBalance(id, changeBalance)
 	if err != nil {
 		return err
@@ -52,8 +53,8 @@ func (u *UsersPostgres) UpdateUserBalance(id int, changeBalance int) error {
 	return nil
 }
 
-func (u *UsersPostgres) CheckForValidUpdateBalance(id int, changeBalance int) (bool, error) {
-	var currentBalance int
+func (u *UsersPostgres) CheckForValidUpdateBalance(id int, changeBalance float64) (bool, error) {
+	var currentBalance float64
 	query := fmt.Sprintf("SELECT balance FROM %s WHERE id=$1", userTable)
 	err := u.db.Get(&currentBalance, query, id)
 	if err != nil {

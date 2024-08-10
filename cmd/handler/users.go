@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"onlineshop/internal/models"
 	"strconv"
@@ -13,7 +14,7 @@ type getUserListResponse struct {
 }
 
 type changeBalance struct {
-	Balance int `json:"balance"`
+	Balance float64 `json:"balance"`
 }
 
 type deleteAccount struct {
@@ -25,7 +26,6 @@ type deleteAccount struct {
 // @Security BearerAuth
 // @Tags users
 // @Description get list of users
-// @Param X-Auth-Token header string true "Authentication Token"
 // @Produce  json
 // @Router /api/users/ [get]
 func (h *Handler) getUserList(c *gin.Context) {
@@ -46,9 +46,10 @@ func (h *Handler) getUserList(c *gin.Context) {
 // @Description get user by id
 // @Param id path int  true  "Account ID"
 // @Produce  json
-// @Router /api/users/:id [get]
+// @Router /api/users/{id} [get]
 func (h *Handler) getUser(c *gin.Context) {
 	searchId := c.Param("id")
+	fmt.Println(searchId)
 	id, err := strconv.Atoi(searchId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -77,7 +78,7 @@ func (h *Handler) getUser(c *gin.Context) {
 // @Param balance body changeBalance true "NewBalance"
 // @Accept  json
 // @Produce  json
-// @Router /api/users/:id [put]
+// @Router /api/users/{id} [put]
 func (h *Handler) changeBalance(c *gin.Context) {
 	var changeBalance changeBalance
 	userid, err := getUserId(c)
@@ -122,7 +123,7 @@ func (h *Handler) changeBalance(c *gin.Context) {
 // @Param data body deleteAccount true "User data"
 // @Accept  json
 // @Produce  json
-// @Router /api/users/:id [delete]
+// @Router /api/users/ [delete]
 func (h *Handler) deleteUser(c *gin.Context) {
 	var userInfo deleteAccount
 	userId, err := getUserId(c)

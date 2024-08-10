@@ -53,11 +53,11 @@ func (p *ProductsPostgres) CheckForExisting(id int, tableName string) (bool, err
 	return exists, err
 }
 
-func (p *ProductsPostgres) DeleteProductById(id int) (error) {
+func (p *ProductsPostgres) DeleteProductById(id int) error {
 	var exists bool
 	exists, err := p.CheckForExisting(id, productsTable)
 	if exists {
-		query := fmt.Sprintf("UPDATE %s SET is_active=FALSE WHERE id=$1", userTable)
+		query := fmt.Sprintf("UPDATE %s SET is_active=FALSE WHERE id=$1", productsTable)
 		_, err := p.db.Exec(query, id)
 
 		if err != nil {
@@ -105,7 +105,7 @@ func (p *ProductsPostgres) UpdateProduct(id int, product models.UpdateProduct) e
 
 		setQuery := strings.Join(setValues, ", ")
 		query := fmt.Sprintf("UPDATE %s SET %s WHERE id = %d", productsTable, setQuery, id)
-		
+
 		logrus.Debugf("updateQuery: %s", query)
 		logrus.Debugf("args: %s", args)
 
@@ -119,3 +119,8 @@ func (p *ProductsPostgres) UpdateProduct(id int, product models.UpdateProduct) e
 	}
 }
 
+func (p *ProductsPostgres) ChangeAmountOfProduct(id int, amount int)error{
+	query := fmt.Sprintf("UPDATE %s SET amount = amount + $1 WHERE id = $2",productsTable)
+	_, err := p.db.Exec(query,amount, id)	
+	return err
+}

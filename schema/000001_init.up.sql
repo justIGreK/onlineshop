@@ -2,7 +2,7 @@ CREATE TABLE "users" (
   "id" serial NOT NULL unique,
   "login" VARCHAR(255) NOT NULL unique,
   "password" VARCHAR(255) NOT NULL,
-  "balance" INT NOT NULL DEFAULT '0',
+  "balance" float NOT NULL DEFAULT '0',
   "is_active" BOOLEAN NOT NULL DEFAULT 'TRUE'
 );
 
@@ -10,7 +10,8 @@ CREATE TABLE "cart" (
   "id" serial NOT NULL unique,
   "user_id" int NOT NULL,
   "product_id" int NOT NULL,
-  "quantity" int NOT NULL
+  "quantity" int NOT NULL,
+  "price" float NOT NULL
 );
 
 CREATE TABLE "orders" (
@@ -18,6 +19,7 @@ CREATE TABLE "orders" (
   "user_id" bigint NOT NULL,
   "price_before" float NOT NULL,
   "price_after" float NOT NULL,
+  "discount" int NOT NULL,
   "payed_at" timestamp NOT NULL DEFAULT 'now()'
 );
 

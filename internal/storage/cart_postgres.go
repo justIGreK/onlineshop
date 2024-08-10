@@ -67,4 +67,9 @@ func (c *CartPostgres) DeleteCartByProduct(userID int, productID int)(error){
 	
 }
 
+func (c *CartPostgres) ClearCart(userID int)error{
+	query := fmt.Sprintf("DELETE FROM %s WHERE user_id=$1", cartTable)
+	_, err := c.db.Exec(query, userID)
+	return err
+}
 

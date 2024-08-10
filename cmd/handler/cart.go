@@ -10,7 +10,13 @@ import (
 type checkCart struct {
 	Data []models.GetCart `json:"data"`
 }
-
+// @Summary Check your cart 
+// @Security BearerAuth
+// @Tags cart
+// @Description get cart by your id from database
+// @Accept  json
+// @Produce  json
+// @Router /api/cart/ [get]
 func (h *Handler) checkCart(c *gin.Context) {
 	userid, err := getUserId(c)
 	if err != nil {
@@ -38,7 +44,14 @@ type addProductToCart struct {
 	ProductId int `json:"product_id" binding:"required"`
 	Quantity  int `json:"quantity" binding:"required"`
 }
-
+// @Summary Add product to your cart
+// @Security BearerAuth
+// @Tags cart
+// @Description add product to your cart by id and amount of product 
+// @Param balance body addProductToCart true "NewProduct"
+// @Accept  json
+// @Produce  json
+// @Router /api/cart/add [post]
 func (h *Handler) addProductToCart(c *gin.Context) {
 	user_id, err := getUserId(c)
 	if err != nil {
@@ -62,7 +75,13 @@ func (h *Handler) addProductToCart(c *gin.Context) {
 		Status: "ok",
 	})
 }
-
+// @Summary Make order
+// @Security BearerAuth
+// @Tags cart
+// @Description create order from your cart  
+// @Accept  json
+// @Produce  json
+// @Router /api/cart/order [post]
 func (h *Handler) makeOrder(c *gin.Context) {
 	user_id, err := getUserId(c)
 	if err != nil {

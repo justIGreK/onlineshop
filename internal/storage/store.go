@@ -14,7 +14,7 @@ type Authorization interface {
 type UserList interface {
 	GetUsersList() ([]models.User, error)
 	GetUserById(id int) (models.User, error)
-	UpdateUserBalance(id int, changeBalance int) error
+	UpdateUserBalance(id int, changeBalance float64) error
 	DeleteAccount(id int, login string, password string) error
 }
 
@@ -25,7 +25,7 @@ type Cart interface {
 	GetCartByUserAndProduct(user_id, product_id int) (models.Cart, error)
 	UpdateCart(userID int, productID int, quantity int, price float64) error
 	DeleteCartByProduct(userID int, productID int) error
-
+	ClearCart(userID int)error
 }
 
 type Product interface {
@@ -35,6 +35,8 @@ type Product interface {
 	DeleteProductById(id int) error
 	CheckForExisting(id int, tableName string) (bool, error)
 	UpdateProduct(id int, product models.UpdateProduct) error
+	ChangeAmountOfProduct(id int, amount int)error
+	
 }
 type Order interface {
 	CreateOrder(userID int, cart []models.GetCart, totalPrice float64, discount int) error

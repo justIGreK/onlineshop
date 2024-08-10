@@ -14,7 +14,7 @@ type Authorization interface {
 type UserList interface {
 	GetUsersList() ([]models.User, error)
 	GetUserById(id int) (models.User, error)
-	ChangeBalance(id int, changeBalance int) error
+	ChangeBalance(id int, changeBalance float64) error
 	DeleteAccount(id int, login string, password string) error
 }
 
@@ -44,12 +44,13 @@ type Service struct {
 	Order
 }
 
+
 func NewService(store *storage.Store) *Service {
 	return &Service{
 		Authorization: NewAuthService(store.Authorization),
 		Product:       NewProdService(store.Product),
 		UserList:      NewUserService(store.UserList),
-		Cart:          NewCartService(store.Cart, store.Product),
+		Cart:          NewCartService(store.Cart, store.Product, store.Order, store.UserList),
 		Order:         NewOrderService(store.Order),
 	}
 }

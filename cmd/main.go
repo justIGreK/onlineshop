@@ -18,7 +18,7 @@ import (
 // @host localhost:8080
 // @BasePath /
 
-// @securityDefinitions.bearer BearerAuth
+// @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
 
