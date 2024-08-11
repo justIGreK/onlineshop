@@ -25,7 +25,7 @@ type Cart interface {
 	GetCartByUserAndProduct(user_id, product_id int) (models.Cart, error)
 	UpdateCart(userID int, productID int, quantity int, price float64) error
 	DeleteCartByProduct(userID int, productID int) error
-	ClearCart(userID int)error
+	ClearCart(userID int) error
 }
 
 type Product interface {
@@ -35,12 +35,14 @@ type Product interface {
 	DeleteProductById(id int) error
 	CheckForExisting(id int, tableName string) (bool, error)
 	UpdateProduct(id int, product models.UpdateProduct) error
-	ChangeAmountOfProduct(id int, amount int)error
-	
+	ChangeAmountOfProduct(id int, amount int) error
 }
 type Order interface {
 	CreateOrder(userID int, cart []models.GetCart, totalPrice float64, discount int) error
 	CreateOrderItems(orderID int, cart []models.GetCart) error
+	GetAllOrders(userID int) ([]models.GetOrder, error)
+	GetOrderDetails(userID int, orderID int) (models.GetOrder, error)
+	GetOrderItems(orderID int) ([]models.OrderItems, error)
 }
 type Store struct {
 	Authorization

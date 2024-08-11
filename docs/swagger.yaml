@@ -126,6 +126,38 @@ paths:
       summary: Make order
       tags:
       - cart
+  /api/orders/:
+    get:
+      consumes:
+      - application/json
+      description: get your orders list from database
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Get orderList
+      tags:
+      - orders
+  /api/orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get order by id from database
+      parameters:
+      - description: order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Get order by id
+      tags:
+      - orders
   /api/products/:
     get:
       consumes:

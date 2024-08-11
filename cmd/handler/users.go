@@ -131,7 +131,6 @@ func (h *Handler) deleteUser(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	if err := c.BindJSON(&userInfo); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

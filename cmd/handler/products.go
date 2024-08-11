@@ -8,13 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type addProduct struct{
-	Name string `json:"name" binding:"required"`
-	Cost float64 `json:"cost" binding:"required,gt=0"`
-	Description string `json:"description"`
-	Amount int `json:"amount" binding:"required,gt=0"`
-	
+type addProduct struct {
+	Name        string  `json:"name" binding:"required"`
+	Cost        float64 `json:"cost" binding:"required,gt=0"`
+	Description string  `json:"description"`
+	Amount      int     `json:"amount" binding:"required,gt=0"`
 }
+
 // @Summary Add product
 // @Security BearerAuth
 // @Tags products
@@ -49,6 +49,7 @@ func (h *Handler) addProduct(c *gin.Context) {
 type getProductListResponse struct {
 	Data []models.Product `json:"data"`
 }
+
 // @Summary Get productlist
 // @Security BearerAuth
 // @Tags products
@@ -67,6 +68,7 @@ func (h *Handler) getProductList(c *gin.Context) {
 	})
 
 }
+
 // @Summary Get product by id
 // @Security BearerAuth
 // @Tags products
@@ -94,8 +96,10 @@ func (h *Handler) getProduct(c *gin.Context) {
 		Cost:        product.Cost,
 		Description: product.Description,
 		Amount:      product.Amount,
+		IsActice:    product.IsActice,
 	})
 }
+
 // @Summary  Change info about product
 // @Security BearerAuth
 // @Tags products
@@ -122,18 +126,17 @@ func (h *Handler) changeProduct(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.UpdateProduct(id, inputProduct); err != nil{
+	if err := h.services.UpdateProduct(id, inputProduct); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
-	
 
 }
+
 // @Summary Delete product by id
 // @Security BearerAuth
 // @Tags products
@@ -160,4 +163,3 @@ func (h *Handler) deleteProduct(c *gin.Context) {
 		Status: "ok",
 	})
 }
-

@@ -34,6 +34,8 @@ type Cart interface {
 }
 
 type Order interface {
+	GetOrderList(id int)([]models.GetOrder, error)
+	GetOrderDetails(userID int, orderID int) (models.GetOrder, []models.OrderItems, error)
 }
 
 type Service struct {

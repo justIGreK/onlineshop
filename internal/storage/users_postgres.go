@@ -72,7 +72,6 @@ func (u *UsersPostgres) CheckForValidUpdateBalance(id int, changeBalance float64
 }
 
 func (u *UsersPostgres) DeleteAccount(id int, login string, password string) error {
-
 	query := fmt.Sprintf("UPDATE %s SET is_active=FALSE WHERE id=$1", userTable)
 	_, err := u.db.Exec(query, id)
 

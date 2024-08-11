@@ -33,8 +33,11 @@ func NewCartService(store storage.Cart, product storage.Product, order storage.O
 // }
 
 func (c *CartService) GetCart(id int) ([]models.GetCart, error) {
-	var cartItems []models.GetCart
+	var cartItems, empty []models.GetCart
 	cartItems, err := c.cartStore.GetCart(id)
+	if err != nil {
+		return empty, fmt.Errorf("error during getting cart: %w", err)
+	}
 	return cartItems, err
 
 }
