@@ -5,6 +5,7 @@ import (
 	"onlineshop/internal/models"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type CartPostgres struct {
@@ -21,6 +22,7 @@ func (c *CartPostgres) CreateCart(user_id int, product_id int, quantity int, pri
 	if err != nil {
 		return err
 	}
+	logrus.Info("cart is created")
 	return err
 }
 
@@ -32,7 +34,6 @@ func (c *CartPostgres) GetCart(user_id int) ([]models.GetCart, error) {
 
 	return cartItems, err
 }
-
 
 // func (c *CartPostgres) CheckForProductInCart(user_id, product_id int) (bool, error){
 // 	query := fmt.Sprintf("SELECT user_id, product_id FROM %s WHERE user_id=$1 AND product_id=$2", cartTable)
@@ -46,30 +47,28 @@ func (c *CartPostgres) GetCart(user_id int) ([]models.GetCart, error) {
 // 	return true, nil
 // }
 
-func (c *CartPostgres) GetCartByUserAndProduct(user_id, product_id int) (models.Cart, error){
+func (c *CartPostgres) GetCartByUserAndProduct(user_id, product_id int) (models.Cart, error) {
 	var cart models.Cart
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id=$1 AND product_id=$2", cartTable)
 	err := c.db.Get(&cart, query, user_id, product_id)
 	return cart, err
 }
 
-
 func (c *CartPostgres) UpdateCart(userID int, productID int, quantity int, price float64) error {
 	query := fmt.Sprintf("UPDATE %s SET quantity=quantity+$1, price=price+$2 WHERE user_id=$3 AND product_id=$4", cartTable)
 	_, err := c.db.Exec(query, quantity, price, userID, productID)
-	return err 
+	return err
 }
 
-func (c *CartPostgres) DeleteCartByProduct(userID int, productID int)(error){
+func (c *CartPostgres) DeleteCartByProduct(userID int, productID int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE user_id=$1 AND product_id=$2", cartTable)
 	_, err := c.db.Exec(query, userID, productID)
-	return err 
-	
+	return err
+
 }
 
-func (c *CartPostgres) ClearCart(userID int)error{
+func (c *CartPostgres) ClearCart(userID int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE user_id=$1", cartTable)
 	_, err := c.db.Exec(query, userID)
 	return err
 }
-

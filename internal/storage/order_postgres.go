@@ -5,6 +5,7 @@ import (
 	"onlineshop/internal/models"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type OrderPostgres struct {
@@ -23,9 +24,11 @@ func (o *OrderPostgres) CreateOrder(userID int, cart []models.GetCart, totalPric
 	if err := row.Scan(&orderID); err != nil {
 		return err
 	}
+	logrus.Info("order is created")
 	if err := o.CreateOrderItems(orderID, cart); err != nil {
 		return err
 	}
+	logrus.Info("order items is created")
 	return nil
 }
 
@@ -54,7 +57,7 @@ func (o *OrderPostgres) GetOrderDetails(userID int, orderID int) (models.GetOrde
 	return order, err
 }
 
-func (o *OrderPostgres) GetOrderItems(orderID int) ([]models.OrderItems, error){
+func (o *OrderPostgres) GetOrderItems(orderID int) ([]models.OrderItems, error) {
 	var orderItems []models.OrderItems
 	query := fmt.Sprintf("SELECT product_id, quantity, total_cost FROM %s WHERE order_id=$1", ordersItemsTable)
 	err := o.db.Select(&orderItems, query, orderID)

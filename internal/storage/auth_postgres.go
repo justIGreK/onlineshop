@@ -5,6 +5,7 @@ import (
 	"onlineshop/internal/models"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type AuthPostgres struct {
@@ -22,6 +23,7 @@ func (a *AuthPostgres) CreateUser(login, password string) (int, error) {
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
+	logrus.Info("user is created")
 	return id, nil
 }
 

@@ -24,7 +24,7 @@ func (p *ProductsPostgres) CreateProduct(prod models.Product) (int, error) {
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
-
+	logrus.Info("product is created")
 	return id, nil
 }
 
