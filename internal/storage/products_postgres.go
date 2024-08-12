@@ -100,7 +100,6 @@ func (p *ProductsPostgres) UpdateProduct(id int, product models.UpdateProduct) e
 		if product.Amount != nil {
 			setValues = append(setValues, fmt.Sprintf("amount=$%d", argsId))
 			args = append(args, *product.Amount)
-			argsId++
 		}
 
 		setQuery := strings.Join(setValues, ", ")
