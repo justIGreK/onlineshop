@@ -47,11 +47,9 @@ func (u *UserService) DeleteAccount(id int, login string, password string) error
 	if err != nil {
 		return fmt.Errorf("error during getting user: %w", err)
 	}
-
 	if user.Login != login || user.Password != password {
 		return errors.New("your password or login is not correct")
 	}
-
 	err = u.store.DeleteAccount(id, login, password)
 	if err != nil {
 		return fmt.Errorf("account cant be deleted due this error: %w", err)

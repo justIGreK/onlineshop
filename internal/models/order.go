@@ -8,7 +8,7 @@ type Order struct {
 	PriceBefore float64   `json:"price_before" db:"price_before" binding:"required"`
 	PriceAfter  float64   `json:"price_after" db:"price_after" binding:"required"`
 	Discount    int       `json:"discount" db:"discount"`
-	PayedAt     time.Time `json:"payed_at" db:"payed_at"`
+	PaidAt      time.Time `json:"paid_at" db:"paid_at"`
 }
 
 type GetOrder struct {
@@ -16,7 +16,7 @@ type GetOrder struct {
 	PriceBefore float64   `json:"price_before" db:"price_before" binding:"required"`
 	PriceAfter  float64   `json:"price_after" db:"price_after" binding:"required"`
 	Discount    int       `json:"discount" db:"discount"`
-	PayedAt     time.Time `json:"payed_at" db:"payed_at"`
+	PaidAt      time.Time `json:"paid_at" db:"paid_at"`
 }
 
 type OrderItems struct {

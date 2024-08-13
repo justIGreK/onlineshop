@@ -14,12 +14,12 @@ func NewProdService(store storage.Product) *ProdService {
 	return &ProdService{store: store}
 }
 
-func (p *ProdService) CreateProduct(name string, cost float64, description string, amount int ) (int, error) {
+func (p *ProdService) CreateProduct(name string, cost float64, description string, amount int) (int, error) {
 	prod := models.Product{
-		Name: name,
-		Cost: cost,
+		Name:        name,
+		Cost:        cost,
 		Description: description,
-		Amount: amount,
+		Amount:      amount,
 	}
 	resp, err := p.store.CreateProduct(prod)
 	if err != nil {
@@ -50,19 +50,17 @@ func (p *ProdService) DeleteProduct(id int) error {
 	if err != nil {
 		return fmt.Errorf("error during deleting product:%w", err)
 	}
-
 	return nil
 }
 
 func (p *ProdService) UpdateProduct(id int, product models.UpdateProduct) error {
-	if err := product.Validate(); err != nil{
-		return err
+	err := product.Validate()
+	if err != nil {
+		return fmt.Errorf("error during validate:%w", err)
 	}
-	err := p.store.UpdateProduct(id, product)
+	err = p.store.UpdateProduct(id, product)
 	if err != nil {
 		return fmt.Errorf("update product got problem:%w", err)
 	}
 	return nil
-
 }
-

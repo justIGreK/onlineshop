@@ -37,12 +37,11 @@ func (h *Handler) checkOrders(c *gin.Context) {
 			Data: orders,
 		})
 	}
-
 }
 
 type getOrderDetails struct {
-	Data models.GetOrder 
-	OrderItems []models.OrderItems 
+	Data       models.GetOrder
+	OrderItems []models.OrderItems
 }
 
 // @Summary Get order by id
@@ -71,8 +70,7 @@ func (h *Handler) getOrder(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, getOrderDetails{
-		Data: order,
+		Data:       order,
 		OrderItems: orderItems,
 	})
-
 }

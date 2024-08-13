@@ -21,7 +21,6 @@ type UserList interface {
 type Cart interface {
 	CreateCart(user_id int, product_id int, quantity int, price float64) error
 	GetCart(id int) ([]models.GetCart, error)
-	//CheckForProductInCart(user_id int, product_id int) (bool, error)
 	GetCartByUserAndProduct(user_id, product_id int) (models.Cart, error)
 	UpdateCart(userID int, productID int, quantity int, price float64) error
 	DeleteCartByProduct(userID int, productID int) error
@@ -38,7 +37,7 @@ type Product interface {
 	ChangeAmountOfProduct(id int, amount int) error
 }
 type Order interface {
-	CreateOrder(userID int, cart []models.GetCart, totalPrice float64, discount int) error
+	CreateOrder(userID int, cart []models.GetCart, totalPrice float64, discount int, sale float64) error
 	CreateOrderItems(orderID int, cart []models.GetCart) error
 	GetAllOrders(userID int) ([]models.GetOrder, error)
 	GetOrderDetails(userID int, orderID int) (models.GetOrder, error)

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"onlineshop/internal/storage"
@@ -29,20 +29,18 @@ func NewAuthService(store storage.Authorization) *AuthService {
 }
 
 func (s *AuthService) CreateUser(login string, password string) (int, error) {
-
 	password = generatePasswordHash(password)
 	i, err := s.store.CreateUser(login, password)
-	if err != nil{
+	if err != nil {
 		return 0, fmt.Errorf("error during creating acc: %w", err)
 	}
 	return i, nil
-	
 }
 
 func (s *AuthService) GenerateToken(login, password string) (string, error) {
 	user, err := s.store.GetUser(login, generatePasswordHash(password))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error during getting user:%w", err)
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.RegisteredClaims{
@@ -51,11 +49,14 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 		}, user.Id,
 	})
 
-	return token.SignedString([]byte(signingKey))
+	entryToken, err := token.SignedString([]byte(signingKey))
+	if err != nil {
+		return "", fmt.Errorf("error during generating token: %w", err)
+	}
+	return entryToken, nil
 }
 
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
-
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(accessToken *jwt.Token) (interface{}, error) {
 		if _, ok := accessToken.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -63,7 +64,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("error during parsing token: %w", err)
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
@@ -75,7 +76,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 }
 
 func generatePasswordHash(password string) string {
-	hash := sha1.New()
+	hash := sha256.New()
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash)

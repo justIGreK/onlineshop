@@ -7,8 +7,8 @@ import (
 	"onlineshop/internal/service"
 	"onlineshop/internal/storage"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 // @title onlineShop App API
@@ -23,10 +23,17 @@ import (
 // @name Authorization
 
 func main() {
-
-	logrus.SetFormatter(new(logrus.JSONFormatter))
+	logger, err := zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if syncErr := logger.Sync(); syncErr != nil {
+			logger.Error("Failed to sync logger", zap.Error(syncErr))
+		}
+	}()
 	if err := InitConfig(); err != nil {
-		logrus.Fatalf("error to read config %s", err.Error())
+		logger.Fatal("error to read config %s", zap.String("error", err.Error()))
 	}
 	db, err := storage.NewPostgresDB(storage.Config{
 		Host:     viper.GetString("db.host"),
@@ -37,17 +44,13 @@ func main() {
 		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
-		logrus.Fatalf("error during connecting to db: %s", err.Error())
+		logger.Fatal("error during connecting to db: %s", zap.String("error", err.Error()))
 	}
-
 	repos := storage.NewStore(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
-
 	srv := new(internal.Server)
-
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error until running server: %s", err.Error())
+		logger.Fatal("error until running server: %s", zap.String("error", err.Error()))
 	}
-
 }

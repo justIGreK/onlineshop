@@ -20,7 +20,7 @@ func (o *OrderService) GetOrderList(id int) ([]models.GetOrder, error) {
 	if err != nil {
 		return empty, fmt.Errorf("error during getting cart: %w", err)
 	}
-	return orders, err
+	return orders, nil
 }
 
 func (o *OrderService) GetOrderDetails(userID int, orderID int) (models.GetOrder, []models.OrderItems, error) {
@@ -28,7 +28,7 @@ func (o *OrderService) GetOrderDetails(userID int, orderID int) (models.GetOrder
 	var orderItems, emptyDetails []models.OrderItems
 	order, err := o.store.GetOrderDetails(userID, orderID)
 	if err != nil {
-		return empty, emptyDetails ,fmt.Errorf("problem during getting order by id: %w", err)
+		return empty, emptyDetails, fmt.Errorf("problem during getting order by id: %w", err)
 	}
 	orderItems, err = o.store.GetOrderItems(orderID)
 	if err != nil {
