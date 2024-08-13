@@ -8,6 +8,9 @@ import (
 	"onlineshop/internal"
 	"onlineshop/internal/service"
 	"onlineshop/internal/storage"
+
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 // @title onlineShop App API
