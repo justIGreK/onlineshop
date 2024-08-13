@@ -3,9 +3,10 @@ package storage
 import (
 	"errors"
 	"fmt"
-	"onlineshop/internal/models"
 
 	"github.com/jmoiron/sqlx"
+
+	"onlineshop/internal/models"
 )
 
 type UsersPostgres struct {

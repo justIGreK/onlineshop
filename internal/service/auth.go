@@ -4,10 +4,11 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"onlineshop/internal/storage"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+
+	"onlineshop/internal/storage"
 )
 
 const (

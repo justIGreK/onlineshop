@@ -2,9 +2,10 @@ package handler
 
 import (
 	"net/http"
-	"onlineshop/internal/models"
 
 	"github.com/gin-gonic/gin"
+
+	"onlineshop/internal/models"
 )
 
 type checkCart struct {
