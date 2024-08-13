@@ -16,11 +16,10 @@ type signUp struct {
 // @Description create account
 // @Accept  json
 // @Produce  json
-// @Param input body signUp true "reg input" 
+// @Param input body signUp true "reg input"
 // @Router /auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var input signUp
-
 	if err := c.ShouldBindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -51,7 +50,6 @@ type signInInput struct {
 // @Router /auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
-
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

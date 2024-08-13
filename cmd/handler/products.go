@@ -25,18 +25,15 @@ type addProduct struct {
 // @Router /api/products/ [post]
 func (h *Handler) addProduct(c *gin.Context) {
 	var input addProduct
-
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	id, err := h.services.Product.CreateProduct(input.Name, input.Cost, input.Description, input.Amount)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id":         id,
 		"name":       input.Name,
@@ -66,7 +63,6 @@ func (h *Handler) getProductList(c *gin.Context) {
 	c.JSON(http.StatusOK, getProductListResponse{
 		Data: products,
 	})
-
 }
 
 // @Summary Get product by id
@@ -84,7 +80,6 @@ func (h *Handler) getProduct(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	product, err := h.services.Product.GetProductById(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -110,12 +105,9 @@ func (h *Handler) getProduct(c *gin.Context) {
 // @Produce  json
 // @Router /api/products/{id} [put]
 func (h *Handler) changeProduct(c *gin.Context) {
-
 	var inputProduct models.UpdateProduct
 	searchId := c.Param("id")
-
 	id, err := strconv.Atoi(searchId)
-
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -125,16 +117,13 @@ func (h *Handler) changeProduct(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	if err := h.services.UpdateProduct(id, inputProduct); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
-
 }
 
 // @Summary Delete product by id
@@ -146,7 +135,6 @@ func (h *Handler) changeProduct(c *gin.Context) {
 // @Produce  json
 // @Router /api/products/{id} [delete]
 func (h *Handler) deleteProduct(c *gin.Context) {
-
 	deleteId := c.Param("id")
 	id, err := strconv.Atoi(deleteId)
 	if err != nil {
@@ -158,7 +146,6 @@ func (h *Handler) deleteProduct(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})

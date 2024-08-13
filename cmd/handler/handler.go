@@ -6,8 +6,8 @@ import (
 	_ "onlineshop/docs"
 
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -20,14 +20,12 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
-
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
 	}
-
 	api := router.Group("/api", h.userIdentity)
 	{
 		users := api.Group("/users")
@@ -44,7 +42,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			products.GET("/:id", h.getProduct)
 			products.PUT("/:id", h.changeProduct)
 			products.DELETE("/:id", h.deleteProduct)
-
 		}
 		cart := api.Group("/cart")
 		{
@@ -58,6 +55,5 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			order.GET("/:id", h.getOrder)
 		}
 	}
-
 	return router
 }

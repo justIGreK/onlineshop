@@ -37,7 +37,6 @@ func (h *Handler) getUserList(c *gin.Context) {
 	c.JSON(http.StatusOK, getUserListResponse{
 		Data: users,
 	})
-
 }
 
 // @Summary Get User
@@ -67,7 +66,6 @@ func (h *Handler) getUser(c *gin.Context) {
 		Password: user.Password,
 		Balance:  user.Balance,
 	})
-
 }
 
 // @Summary Update user
@@ -113,7 +111,6 @@ func (h *Handler) changeBalance(c *gin.Context) {
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
-
 }
 
 // @Summary Delete user
@@ -140,9 +137,7 @@ func (h *Handler) deleteUser(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
-
 }

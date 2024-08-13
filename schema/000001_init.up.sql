@@ -20,7 +20,7 @@ CREATE TABLE "orders" (
   "price_before" float NOT NULL,
   "price_after" float NOT NULL,
   "discount" int NOT NULL,
-  "payed_at" timestamp NOT NULL DEFAULT 'now()'
+  "paid_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "orders_items" (

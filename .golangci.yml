@@ -21,7 +21,6 @@ linters:
     - depguard # checks if package imports are in a list of acceptable packages.
     - errname # checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error.
     - exportloopref # checks for pointers to enclosing loop variables. As of Go 1.22, this problem no longer occurs and fixed by Go team.
-    - gci # controls Go package import order and makes it always deterministic.
     - gocritic # provides diagnostics that check for bugs, performance and style issues.
     - gofmt # checks whether code was gofmt-ed.
     - gosec # inspects source code for security problems.
@@ -39,8 +38,6 @@ linters:
     - wrapcheck # checks that errors returned from external packages are wrapped.
 
 linters-settings:
-  gci:
-    sections: [standard, default, localmodule]
   gosec:
     excludes:
       # duplicates errcheck
