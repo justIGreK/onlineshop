@@ -2,10 +2,11 @@ package handler
 
 import (
 	"net/http"
-	"onlineshop/internal/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"onlineshop/internal/models"
 )
 
 type addProduct struct {

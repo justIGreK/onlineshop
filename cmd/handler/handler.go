@@ -1,13 +1,12 @@
 package handler
 
 import (
-	"onlineshop/internal/service"
-
-	_ "onlineshop/docs"
-
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+
+	_ "onlineshop/docs"
+	"onlineshop/internal/service"
 )
 
 type Handler struct {

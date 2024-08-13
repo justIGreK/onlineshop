@@ -2,10 +2,11 @@ package storage
 
 import (
 	"fmt"
-	"onlineshop/internal/models"
 
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+
+	"onlineshop/internal/models"
 )
 
 type CartPostgres struct {

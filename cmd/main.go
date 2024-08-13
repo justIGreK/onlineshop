@@ -1,14 +1,13 @@
 package main
 
 import (
-	"onlineshop/cmd/handler"
-	"onlineshop/internal"
-
-	"onlineshop/internal/service"
-	"onlineshop/internal/storage"
-
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+
+	"onlineshop/cmd/handler"
+	"onlineshop/internal"
+	"onlineshop/internal/service"
+	"onlineshop/internal/storage"
 )
 
 // @title onlineShop App API

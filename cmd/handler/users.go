@@ -3,10 +3,11 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"onlineshop/internal/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"onlineshop/internal/models"
 )
 
 type getUserListResponse struct {

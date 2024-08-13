@@ -22,6 +22,5 @@ func (i UpdateProduct) Validate() error {
 	if i.Name == nil && i.Description == nil && i.Cost == nil && i.Amount == nil {
 		return errors.New("update structure has no values")
 	}
-
 	return nil
 }

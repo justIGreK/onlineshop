@@ -1,9 +1,9 @@
 package storage
 
 import (
-	"onlineshop/internal/models"
-
 	"github.com/jmoiron/sqlx"
+
+	"onlineshop/internal/models"
 )
 
 type Authorization interface {
