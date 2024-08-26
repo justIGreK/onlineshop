@@ -56,12 +56,10 @@ func main() {
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			// Обработка ошибки, например логирование
 			logger.Logger.Fatal("failed to close connection: %v", zap.String("error", err.Error()))
 		}
 	}()
 	grpcSender := grpcrequest.NewGrpcRequst(conn)
-	// repos := storage.NewAuthPostgres(db)
 	repos := storage.NewStore(db)
 	natsSender := publisher.NewNATSMessageSender(nc, repos.UserList)
 	handler := handler.Handler{
