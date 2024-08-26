@@ -19,6 +19,15 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 
 func (a *AuthPostgres) CreateUser(login, password string) (int, error) {
 	var id int
+	logger, err := zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if syncErr := logger.Sync(); syncErr != nil {
+			logger.Error("Failed to sync logger", zap.Error(syncErr))
+		}
+	}()
 	query := fmt.Sprintf("INSERT INTO %s (login, password) values ($1, $2) RETURNING id", userTable)
 	row := a.db.QueryRow(query, login, password)
 	if err := row.Scan(&id); err != nil {

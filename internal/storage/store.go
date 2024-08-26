@@ -42,6 +42,7 @@ import "github.com/jmoiron/sqlx"
 //		GetOrderDetails(userID int, orderID int) (models.GetOrder, error)
 //		GetOrderItems(orderID int) ([]models.OrderItems, error)
 //	}
+
 type Store struct {
 	Authorization *AuthPostgres
 	UserList *UsersPostgres

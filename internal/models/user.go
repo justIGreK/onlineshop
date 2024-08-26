@@ -8,4 +8,3 @@ type User struct {
 	IsActice bool    `json:"is_active" db:"is_active"`
 	Role     string  `json:"role" db:"role"`
 }
-
