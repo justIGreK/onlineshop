@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 
 	"onlineshop/internal/models"
+	"onlineshop/pkg/util/logger"
 )
 
 type ProductsPostgres struct {
@@ -20,15 +20,6 @@ func NewProductsPostgres(db *sqlx.DB) *ProductsPostgres {
 
 func (p *ProductsPostgres) CreateProduct(prod models.Product) (int, error) {
 	var id int
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if syncErr := logger.Sync(); syncErr != nil {
-			logger.Error("Failed to sync logger", zap.Error(syncErr))
-		}
-	}()
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, cost, description, amount)"+
 			"values ($1, $2, $3, $4) RETURNING id",
@@ -37,7 +28,7 @@ func (p *ProductsPostgres) CreateProduct(prod models.Product) (int, error) {
 	if err := row.Scan(&id); err != nil {
 		return 0, fmt.Errorf("error during Scanning id fr creating product: %w", err)
 	}
-	logger.Info("product is created")
+	logger.Logger.Info("product is created")
 	return id, nil
 }
 
@@ -88,11 +79,7 @@ func (p *ProductsPostgres) DeleteProductById(id int) error {
 
 func (p *ProductsPostgres) UpdateProduct(id int, product models.UpdateProduct) error {
 	var exists bool
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	exists, err = p.CheckForExisting(id, productsTable)
+	exists, err := p.CheckForExisting(id, productsTable)
 	if err != nil {
 		return err
 	}
@@ -124,7 +111,6 @@ func (p *ProductsPostgres) UpdateProduct(id int, product models.UpdateProduct) e
 		setQuery := strings.Join(setValues, ", ")
 		query := fmt.Sprintf("UPDATE %s SET %s WHERE id = %d", productsTable, setQuery, id)
 
-		logger.Debug("updateQuery: %s", zap.String("query", query))
 		_, err = p.db.Exec(query, args...)
 		if err != nil {
 			return fmt.Errorf("error during updating product: %w", err)

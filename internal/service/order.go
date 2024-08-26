@@ -4,14 +4,21 @@ import (
 	"fmt"
 
 	"onlineshop/internal/models"
-	"onlineshop/internal/storage"
 )
 
-type OrderService struct {
-	store storage.Order
+type Order interface {
+	CreateOrder(userID int, cart []models.GetCart, totalPrice float64, discount int, sale float64) error
+	CreateOrderItems(orderID int, cart []models.GetCart) error
+	GetAllOrders(userID int) ([]models.GetOrder, error)
+	GetOrderDetails(userID int, orderID int) (models.GetOrder, error)
+	GetOrderItems(orderID int) ([]models.OrderItems, error)
 }
 
-func NewOrderService(store storage.Order) *OrderService {
+type OrderService struct {
+	store Order
+}
+
+func NewOrderService(store Order) *OrderService {
 	return &OrderService{store: store}
 }
 

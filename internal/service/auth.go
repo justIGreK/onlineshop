@@ -8,7 +8,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"onlineshop/internal/storage"
+	"onlineshop/internal/models"
+	grpcrequest "onlineshop/pkg/grpcReq"
 )
 
 const (
@@ -16,20 +17,31 @@ const (
 	signingKey = "fsjklj235OIUJlknm24"
 )
 
-type AuthService struct {
-	store storage.Authorization
+type Authorization interface {
+	CreateUser(login, password string) (int, error)
+	GetUser(login, password string) (models.User, error)
 }
-
 type tokenClaims struct {
 	jwt.RegisteredClaims
-	UserId int `json:"user_id"`
+	UserId   int    `json:"user_id"`
+	UserRole string `json:"user_role"`
 }
 
-func NewAuthService(store storage.Authorization) *AuthService {
-	return &AuthService{store: store}
+type AuthService struct {
+	store Authorization
+	grpcSender grpcrequest.GrpcRequest
 }
 
-func (s *AuthService) CreateUser(login string, password string) (int, error) {
+
+func NewAuthService(store Authorization, grpcSender grpcrequest.GrpcRequest) *AuthService {
+	return &AuthService{store: store, grpcSender: grpcSender}
+}
+
+func (s *AuthService) CreateUser(login string, password string, email string) (int, error) {
+	isValid := s.grpcSender.GetRequest(email)
+	if !isValid {
+		return 0, errors.New("email is not valid")
+	}
 	password = generatePasswordHash(password)
 	i, err := s.store.CreateUser(login, password)
 	if err != nil {
@@ -47,7 +59,7 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		}, user.Id,
+		}, user.Id, user.Role,
 	})
 
 	entryToken, err := token.SignedString([]byte(signingKey))
@@ -57,7 +69,7 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 	return entryToken, nil
 }
 
-func (s *AuthService) ParseToken(accessToken string) (int, error) {
+func (s *AuthService) ParseToken(accessToken string) (int, string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(accessToken *jwt.Token) (interface{}, error) {
 		if _, ok := accessToken.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -65,15 +77,15 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, fmt.Errorf("error during parsing token: %w", err)
+		return 0, "", fmt.Errorf("error during parsing token: %w", err)
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, errors.New("token claims are not of type *tokenClaims")
+		return 0, "", errors.New("token claims are not of type *tokenClaims")
 	}
 
-	return claims.UserId, nil
+	return claims.UserId, claims.UserRole, nil
 }
 
 func generatePasswordHash(password string) string {

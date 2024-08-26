@@ -56,13 +56,18 @@ const docTemplate = `{
                 "summary": "Add product to your cart",
                 "parameters": [
                     {
-                        "description": "NewProduct",
-                        "name": "balance",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.addProductToCart"
-                        }
+                        "type": "integer",
+                        "description": "Id of product",
+                        "name": "productId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Quantity of product",
+                        "name": "quantity",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -179,13 +184,31 @@ const docTemplate = `{
                 "summary": "Add product",
                 "parameters": [
                     {
-                        "description": "NewProduct",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.addProduct"
-                        }
+                        "type": "string",
+                        "description": "product name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "price for product",
+                        "name": "cost",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "product description",
+                        "name": "description",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "amount of product",
+                        "name": "amount",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -322,13 +345,62 @@ const docTemplate = `{
                 "summary": "Delete user",
                 "parameters": [
                     {
-                        "description": "User data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.deleteAccount"
-                        }
+                        "type": "string",
+                        "description": "your login",
+                        "name": "login",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "your password",
+                        "name": "password",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/users/link/{service}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "link your account with another service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "link account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "service",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "your login",
+                        "name": "login",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "your password",
+                        "name": "password",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -386,13 +458,11 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "NewBalance",
+                        "type": "number",
+                        "description": "how many money do you want add/receive(type with -)",
                         "name": "balance",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.changeBalance"
-                        }
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -413,13 +483,18 @@ const docTemplate = `{
                 "summary": "SignIn",
                 "parameters": [
                     {
-                        "description": "account info",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.signInInput"
-                        }
+                        "type": "string",
+                        "description": "your login",
+                        "name": "login",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "your password",
+                        "name": "password",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -440,13 +515,25 @@ const docTemplate = `{
                 "summary": "SignUp",
                 "parameters": [
                     {
-                        "description": "reg input",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.signUp"
-                        }
+                        "type": "string",
+                        "description": "your login",
+                        "name": "login",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "your password",
+                        "name": "password",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "your email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -454,98 +541,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.addProduct": {
-            "type": "object",
-            "required": [
-                "amount",
-                "cost",
-                "name"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "integer"
-                },
-                "cost": {
-                    "type": "number"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.addProductToCart": {
-            "type": "object",
-            "required": [
-                "product_id",
-                "quantity"
-            ],
-            "properties": {
-                "product_id": {
-                    "type": "integer"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.changeBalance": {
-            "type": "object",
-            "properties": {
-                "balance": {
-                    "type": "number"
-                }
-            }
-        },
-        "handler.deleteAccount": {
-            "type": "object",
-            "required": [
-                "login",
-                "password"
-            ],
-            "properties": {
-                "login": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.signInInput": {
-            "type": "object",
-            "required": [
-                "login",
-                "password"
-            ],
-            "properties": {
-                "login": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 6
-                }
-            }
-        },
-        "handler.signUp": {
-            "type": "object",
-            "required": [
-                "login",
-                "password"
-            ],
-            "properties": {
-                "login": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 6
-                }
-            }
-        },
         "models.UpdateProduct": {
             "type": "object",
             "properties": {

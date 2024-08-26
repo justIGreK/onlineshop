@@ -9,6 +9,14 @@ import (
 	"onlineshop/internal/models"
 )
 
+type Product interface {
+	CreateProduct(name string, cost float64, description string, amount int) (int, error)
+	GetProductList() ([]models.Product, error)
+	GetProductById(id int) (models.Product, error)
+	DeleteProduct(id int) error
+	UpdateProduct(id int, product models.UpdateProduct) error
+}
+
 type addProduct struct {
 	Name        string  `json:"name" binding:"required"`
 	Cost        float64 `json:"cost" binding:"required,gt=0"`
@@ -20,17 +28,41 @@ type addProduct struct {
 // @Security BearerAuth
 // @Tags products
 // @Description add product to database
-// @Param product body addProduct true "NewProduct"
+// @Param name query string true "product name"
+// @Param cost query float64 true "price for product"
+// @Param description query string false "product description"
+// @Param amount query int true "amount of product"
 // @Accept  json
 // @Produce  json
 // @Router /api/products/ [post]
 func (h *Handler) addProduct(c *gin.Context) {
-	var input addProduct
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+	userRole, err := getUserRole(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	id, err := h.services.Product.CreateProduct(input.Name, input.Cost, input.Description, input.Amount)
+	if userRole != AdministratorRole {
+		newErrorResponse(c, http.StatusUnauthorized, "You have 	no permission to do this")
+	}
+	strCost := c.Query("cost")
+	cost, err := strconv.ParseFloat(strCost, 64)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "Invalid cost")
+		return
+	}
+	strAmount := c.Query("amount")
+	amount, err := strconv.Atoi(strAmount)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "Invalid amount")
+		return
+	}
+	input := addProduct{
+		Name:        c.Query("name"),
+		Cost:        float64(cost),
+		Description: c.Query("description"),
+		Amount:      amount,
+	}
+	id, err := h.Prod.CreateProduct(input.Name, input.Cost, input.Description, input.Amount)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -56,7 +88,7 @@ type getProductListResponse struct {
 // @Produce  json
 // @Router /api/products/ [get]
 func (h *Handler) getProductList(c *gin.Context) {
-	products, err := h.services.Product.GetProductList()
+	products, err := h.Prod.GetProductList()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -81,7 +113,7 @@ func (h *Handler) getProduct(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	product, err := h.services.Product.GetProductById(id)
+	product, err := h.Prod.GetProductById(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -106,6 +138,14 @@ func (h *Handler) getProduct(c *gin.Context) {
 // @Produce  json
 // @Router /api/products/{id} [put]
 func (h *Handler) changeProduct(c *gin.Context) {
+	userRole, err := getUserRole(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if userRole != AdministratorRole {
+		newErrorResponse(c, http.StatusUnauthorized, "You have no permission to do this")
+	}
 	var inputProduct models.UpdateProduct
 	searchId := c.Param("id")
 	id, err := strconv.Atoi(searchId)
@@ -118,7 +158,7 @@ func (h *Handler) changeProduct(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := h.services.UpdateProduct(id, inputProduct); err != nil {
+	if err := h.Prod.UpdateProduct(id, inputProduct); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -136,13 +176,21 @@ func (h *Handler) changeProduct(c *gin.Context) {
 // @Produce  json
 // @Router /api/products/{id} [delete]
 func (h *Handler) deleteProduct(c *gin.Context) {
+	userRole, err := getUserRole(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if userRole != AdministratorRole {
+		newErrorResponse(c, http.StatusUnauthorized, "You have no permission to do this")
+	}
 	deleteId := c.Param("id")
 	id, err := strconv.Atoi(deleteId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	err = h.services.Product.DeleteProduct(id)
+	err = h.Prod.DeleteProduct(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

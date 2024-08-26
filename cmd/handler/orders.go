@@ -9,6 +9,11 @@ import (
 	"onlineshop/internal/models"
 )
 
+type Order interface {
+	GetOrderList(id int) ([]models.GetOrder, error)
+	GetOrderDetails(userID int, orderID int) (models.GetOrder, []models.OrderItems, error)
+}
+
 type checkOrder struct {
 	Data []models.GetOrder `json:"data"`
 }
@@ -26,7 +31,7 @@ func (h *Handler) checkOrders(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	orders, err := h.services.GetOrderList(userid)
+	orders, err := h.Ord.GetOrderList(userid)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -65,7 +70,7 @@ func (h *Handler) getOrder(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	order, orderItems, err := h.services.GetOrderDetails(userID, orderID)
+	order, orderItems, err := h.Ord.GetOrderDetails(userID, orderID)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

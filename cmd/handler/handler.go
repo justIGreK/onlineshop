@@ -2,19 +2,38 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "onlineshop/docs"
 	"onlineshop/internal/service"
 )
 
+const (
+	AdministratorRole string = "admin"
+	CustomerRole      string = "customer"
+)
+
 type Handler struct {
-	services *service.Service
+	Auth Authorization
+	User UserList
+	Prod Product
+	Crt  Cart
+	Ord  Order
 }
 
-func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+func NewHandler(auth *service.AuthService,
+	user *service.UserService,
+	prod *service.ProdService,
+	crt *service.CartService,
+	ord *service.OrderService) *Handler {
+	return &Handler{
+		Auth: auth,
+		User: user,
+		Prod: prod,
+		Crt:  crt,
+		Ord:  ord,
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
@@ -33,6 +52,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			users.GET("/:id", h.getUser)
 			users.PUT("/:id", h.changeBalance)
 			users.DELETE("/", h.deleteUser)
+			users.POST("link/:service", h.linkAcc)
 		}
 		products := api.Group("/products")
 		{

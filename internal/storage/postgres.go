@@ -13,6 +13,7 @@ const (
 	ordersItemsTable = "orders_items"
 	cartTable        = "cart"
 	productsTable    = "products"
+	connectionTable  = "user_service_connections"
 )
 
 type Config struct {

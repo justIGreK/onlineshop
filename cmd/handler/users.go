@@ -10,12 +10,16 @@ import (
 	"onlineshop/internal/models"
 )
 
-type getUserListResponse struct {
-	Data []models.User `json:"data"`
+type UserList interface {
+	GetUsersList() ([]models.User, error)
+	GetUserById(id int) (models.User, error)
+	ChangeBalance(id int, changeBalance float64) error
+	DeleteAccount(id int, login string, password string) error
+	LinkAccount(id int, login, password, srv string) error
 }
 
-type changeBalance struct {
-	Balance float64 `json:"balance"`
+type getUserListResponse struct {
+	Data []models.User `json:"data"`
 }
 
 type deleteAccount struct {
@@ -30,7 +34,16 @@ type deleteAccount struct {
 // @Produce  json
 // @Router /api/users/ [get]
 func (h *Handler) getUserList(c *gin.Context) {
-	users, err := h.services.UserList.GetUsersList()
+	userRole, err := getUserRole(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if userRole != AdministratorRole {
+		newErrorResponse(c, http.StatusUnauthorized, "You have no permission to do this")
+		return
+	}
+	users, err := h.User.GetUsersList()
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -56,7 +69,7 @@ func (h *Handler) getUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.services.UserList.GetUserById(id)
+	user, err := h.User.GetUserById(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,12 +87,11 @@ func (h *Handler) getUser(c *gin.Context) {
 // @Tags users
 // @Description update balance of user
 // @Param id path int  true  "Account ID"
-// @Param balance body changeBalance true "NewBalance"
+// @Param balance query float64 true "how many money do you want add/receive(type with -)"
 // @Accept  json
 // @Produce  json
 // @Router /api/users/{id} [put]
 func (h *Handler) changeBalance(c *gin.Context) {
-	var changeBalance changeBalance
 	userid, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -98,12 +110,14 @@ func (h *Handler) changeBalance(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&changeBalance); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+	strBalance := c.Query("balance")
+	balance, err := strconv.ParseFloat(strBalance, 64)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid balance")
 		return
 	}
 
-	err = h.services.UserList.ChangeBalance(id, changeBalance.Balance)
+	err = h.User.ChangeBalance(id, balance)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -118,27 +132,63 @@ func (h *Handler) changeBalance(c *gin.Context) {
 // @Security BearerAuth
 // @Tags users
 // @Description delete user or change user acc to inactive
-// @Param data body deleteAccount true "User data"
+// @Param login query string true "your login"
+// @Param password query string true "your password"
 // @Accept  json
 // @Produce  json
 // @Router /api/users/ [delete]
 func (h *Handler) deleteUser(c *gin.Context) {
-	var userInfo deleteAccount
 	userId, err := getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if err := c.BindJSON(&userInfo); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
+	userInfo := deleteAccount{
+		Login:    c.Query("login"),
+		Password: c.Query("password"),
 	}
-	err = h.services.UserList.DeleteAccount(userId, userInfo.Login, userInfo.Password)
+	err = h.User.DeleteAccount(userId, userInfo.Login, userInfo.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
+	})
+}
+
+// @Summary link account
+// @Security BearerAuth
+// @Tags users
+// @Description link your account with another service
+// @Param service path string true "service"
+// @Param login query string true "your login"
+// @Param password query string true "your password"
+// @Accept  json
+// @Produce  json
+// @Router /api/users/link/{service} [post]
+func (h *Handler) linkAcc(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	srv := c.Param("service")
+	userInfo := SignIn{
+		Login:    c.Query("login"),
+		Password: c.Query("password"),
+	}
+	if err := c.ShouldBind(&userInfo); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = h.User.LinkAccount(userId, userInfo.Login, userInfo.Password, srv)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, statusResponse{
+		Status: "service was connected",
 	})
 }

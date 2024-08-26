@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 
 	"onlineshop/internal/models"
+	"onlineshop/pkg/util/logger"
 )
 
 type CartPostgres struct {
@@ -18,21 +18,12 @@ func NewCartPostgres(db *sqlx.DB) *CartPostgres {
 }
 
 func (c *CartPostgres) CreateCart(user_id int, product_id int, quantity int, price float64) error {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if syncErr := logger.Sync(); syncErr != nil {
-			logger.Error("Failed to sync logger", zap.Error(syncErr))
-		}
-	}()
 	query := fmt.Sprintf("INSERT INTO %s (user_id, product_id, quantity, price) values ($1, $2, $3, $4)", cartTable)
-	_, err = c.db.Exec(query, user_id, product_id, quantity, price)
+	_, err := c.db.Exec(query, user_id, product_id, quantity, price)
 	if err != nil {
 		return fmt.Errorf("error during inserting to db: %w", err)
 	}
-	logger.Info("cart is created")
+	logger.Logger.Info("cart is created")
 	return nil
 }
 
