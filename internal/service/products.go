@@ -4,14 +4,22 @@ import (
 	"fmt"
 
 	"onlineshop/internal/models"
-	"onlineshop/internal/storage"
 )
 
+type Product interface {
+	CreateProduct(prod models.Product) (int, error)
+	GetAllProducts() ([]models.Product, error)
+	GetProductById(id int) (models.Product, error)
+	DeleteProductById(id int) error
+	CheckForExisting(id int, tableName string) (bool, error)
+	UpdateProduct(id int, product models.UpdateProduct) error
+	ChangeAmountOfProduct(id int, amount int) error
+}
 type ProdService struct {
-	store storage.Product
+	store Product
 }
 
-func NewProdService(store storage.Product) *ProdService {
+func NewProdService(store Product) *ProdService {
 	return &ProdService{store: store}
 }
 

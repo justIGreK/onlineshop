@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 
 	"onlineshop/internal/models"
+	"onlineshop/pkg/util/logger"
 )
 
 type OrderPostgres struct {
@@ -24,22 +24,13 @@ func (o *OrderPostgres) CreateOrder(
 	discount int,
 	sale float64) error {
 	var orderID int
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if syncErr := logger.Sync(); syncErr != nil {
-			logger.Error("Failed to sync logger", zap.Error(syncErr))
-		}
-	}()
 	query := fmt.Sprintf("INSERT INTO %s (user_id, price_before, price_after, discount)"+
 		" values ($1, $2, $3, $4) RETURNING id", ordersTable)
 	row := o.db.QueryRow(query, userID, totalPrice, (totalPrice * sale), discount)
 	if err := row.Scan(&orderID); err != nil {
 		return fmt.Errorf("error during scanning orderId: %w", err)
 	}
-	logger.Info("order is created")
+	logger.Logger.Info("order is created")
 	if err := o.CreateOrderItems(orderID, cart); err != nil {
 		return err
 	}
@@ -48,15 +39,6 @@ func (o *OrderPostgres) CreateOrder(
 }
 
 func (o *OrderPostgres) CreateOrderItems(orderID int, cart []models.GetCart) error {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if syncErr := logger.Sync(); syncErr != nil {
-			logger.Error("Failed to sync logger", zap.Error(syncErr))
-		}
-	}()
 	query := fmt.Sprintf("INSERT INTO %s (order_id, product_id, quantity, total_cost)"+
 		" values ($1, $2, $3, $4)", ordersItemsTable)
 	for _, cartItems := range cart {
@@ -65,7 +47,7 @@ func (o *OrderPostgres) CreateOrderItems(orderID int, cart []models.GetCart) err
 			return fmt.Errorf("error during creating orderitems: %w", err)
 		}
 	}
-	logger.Info("order items is created")
+	logger.Logger.Info("order items is created")
 	return nil
 }
 func (o *OrderPostgres) GetAllOrders(userID int) ([]models.GetOrder, error) {

@@ -2,7 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+
+	"onlineshop/pkg/util/logger"
 )
 
 type errorResponse struct {
@@ -14,15 +15,6 @@ type statusResponse struct {
 }
 
 func newErrorResponse(c *gin.Context, statusCode int, message string) {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if syncErr := logger.Sync(); syncErr != nil {
-			logger.Error("Failed to sync logger", zap.Error(syncErr))
-		}
-	}()
-	logger.Info(message)
+	logger.Logger.Info(message)
 	c.AbortWithStatusJSON(statusCode, errorResponse{message})
 }

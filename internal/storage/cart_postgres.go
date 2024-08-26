@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 
 	"onlineshop/internal/models"
+	"onlineshop/pkg/util/logger"
 )
 
 type CartPostgres struct {
@@ -32,7 +32,7 @@ func (c *CartPostgres) CreateCart(user_id int, product_id int, quantity int, pri
 	if err != nil {
 		return fmt.Errorf("error during inserting to db: %w", err)
 	}
-	logger.Info("cart is created")
+	logger.Logger.Info("cart is created")
 	return nil
 }
 

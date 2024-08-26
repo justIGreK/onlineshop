@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/zap"
 
 	"onlineshop/internal/models"
+	"onlineshop/pkg/util/logger"
 )
 
 type AuthPostgres struct {
@@ -31,15 +31,15 @@ func (a *AuthPostgres) CreateUser(login, password string) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (login, password) values ($1, $2) RETURNING id", userTable)
 	row := a.db.QueryRow(query, login, password)
 	if err := row.Scan(&id); err != nil {
-		return 0, fmt.Errorf("error during inserting into db")
+		return 0, fmt.Errorf("error during inserting into db:%w", err)
 	}
-	logger.Info("user is created")
+	logger.Logger.Info("user is created")
 	return id, nil
 }
 
 func (a *AuthPostgres) GetUser(login, password string) (models.User, error) {
 	var user, empty models.User
-	query := fmt.Sprintf("SELECT id FROM %s WHERE login=$1 AND password=$2 AND is_active=TRUE", userTable)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE login=$1 AND password=$2 AND is_active=TRUE", userTable)
 	err := a.db.Get(&user, query, login, password)
 	if err != nil {
 		return empty, fmt.Errorf("error during selecting from db: %w", err)

@@ -4,6 +4,7 @@ CREATE TABLE "users" (
   "password" VARCHAR(255) NOT NULL,
   "balance" float NOT NULL DEFAULT '0',
   "is_active" BOOLEAN NOT NULL DEFAULT 'TRUE'
+  "role" VARCHAR(255) NOT NULL DEFAULT 'customer'
 );
 
 CREATE TABLE "cart" (
@@ -39,6 +40,14 @@ CREATE TABLE "products" (
   "amount" int NOT NULL,
   "is_active" BOOLEAN NOT NULL DEFAULT 'TRUE'
 );
+
+CREATE TABLE "user_service_connections" (
+    "user_id" INT NOT NULL,
+    "service" VARCHAR(255) NOT NULL,
+    "service_id" INT NOT NULL
+);
+
+CREATE UNIQUE INDEX "unique_user_service" ON "user_service_connections" ("userId", "service");
 
 ALTER TABLE "cart" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 

@@ -10,7 +10,8 @@ import (
 
 const (
 	authorizationHeader = "Authorization"
-	userCtx             = "userId"
+	userIdCtx           = "userId"
+	userRoleCtx         = "userRole"
 	parts               = 2
 )
 
@@ -25,12 +26,13 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
 		return
 	}
-	userId, err := h.services.Authorization.ParseToken(headerParts[1])
+
+	userId, userRole, err := h.Auth.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	user, err := h.services.GetUserById(userId)
+	user, err := h.User.GetUserById(userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
@@ -38,11 +40,12 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	if !user.IsActice {
 		newErrorResponse(c, http.StatusUnauthorized, "This token of banned or deleted user")
 	}
-	c.Set(userCtx, userId)
+	c.Set(userIdCtx, userId)
+	c.Set(userRoleCtx, userRole)
 }
 
 func getUserId(c *gin.Context) (int, error) {
-	id, ok := c.Get(userCtx)
+	id, ok := c.Get(userIdCtx)
 	if !ok {
 		return 0, errors.New("user id not found")
 	}
@@ -51,4 +54,16 @@ func getUserId(c *gin.Context) (int, error) {
 		return 0, errors.New("user id is of invalid type")
 	}
 	return idInt, nil
+}
+
+func getUserRole(c *gin.Context) (string, error) {
+	role, ok := c.Get(userRoleCtx)
+	if !ok {
+		return "", errors.New("user role not found")
+	}
+	userRole, ok := role.(string)
+	if !ok {
+		return "", errors.New("user role is of invalid type")
+	}
+	return userRole, nil
 }

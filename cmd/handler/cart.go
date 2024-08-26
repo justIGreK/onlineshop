@@ -2,11 +2,18 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
 	"onlineshop/internal/models"
 )
+
+type Cart interface {
+	GetCart(id int) ([]models.GetCart, error)
+	AddProductToCart(user_id int, product_id int, quantity int) error
+	MakeOrder(user_id int) error
+}
 
 type checkCart struct {
 	Data []models.GetCart `json:"data"`
@@ -25,6 +32,7 @@ func (h *Handler) checkCart(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	cartItems, err := h.Crt.GetCart(userid)
 	cartItems, err := h.services.GetCart(userid)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -48,7 +56,8 @@ type addProductToCart struct {
 // @Security BearerAuth
 // @Tags cart
 // @Description add product to your cart by id and amount of product
-// @Param balance body addProductToCart true "NewProduct"
+// @Param productId query int true "Id of product"
+// @Param quantity query int true "Quantity of product"
 // @Accept  json
 // @Produce  json
 // @Router /api/cart/add [post]
@@ -58,12 +67,23 @@ func (h *Handler) addProductToCart(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	var product addProductToCart
-	if err := c.BindJSON(&product); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+	strProductId := c.Query("productId")
+	productId, err := strconv.Atoi(strProductId)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "Invalid product id")
 		return
 	}
-	err = h.services.Cart.AddProductToCart(user_id, product.ProductId, product.Quantity)
+	strQuantity := c.Query("quantity")
+	quantity, err := strconv.Atoi(strQuantity)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "Invalid quantity")
+		return
+	}
+	product := addProductToCart{
+		ProductId: productId,
+		Quantity:  quantity,
+	}
+	err = h.Crt.AddProductToCart(user_id, product.ProductId, product.Quantity)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -86,7 +106,7 @@ func (h *Handler) makeOrder(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	err = h.services.Cart.MakeOrder(user_id)
+	err = h.Crt.MakeOrder(user_id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

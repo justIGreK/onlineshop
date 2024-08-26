@@ -1,67 +1,5 @@
 basePath: /
 definitions:
-  handler.addProduct:
-    properties:
-      amount:
-        type: integer
-      cost:
-        type: number
-      description:
-        type: string
-      name:
-        type: string
-    required:
-    - amount
-    - cost
-    - name
-    type: object
-  handler.addProductToCart:
-    properties:
-      product_id:
-        type: integer
-      quantity:
-        type: integer
-    required:
-    - product_id
-    - quantity
-    type: object
-  handler.changeBalance:
-    properties:
-      balance:
-        type: number
-    type: object
-  handler.deleteAccount:
-    properties:
-      login:
-        type: string
-      password:
-        type: string
-    required:
-    - login
-    - password
-    type: object
-  handler.signInInput:
-    properties:
-      login:
-        type: string
-      password:
-        minLength: 6
-        type: string
-    required:
-    - login
-    - password
-    type: object
-  handler.signUp:
-    properties:
-      login:
-        type: string
-      password:
-        minLength: 6
-        type: string
-    required:
-    - login
-    - password
-    type: object
   models.UpdateProduct:
     properties:
       amount:
@@ -99,12 +37,16 @@ paths:
       - application/json
       description: add product to your cart by id and amount of product
       parameters:
-      - description: NewProduct
-        in: body
-        name: balance
+      - description: Id of product
+        in: query
+        name: productId
         required: true
-        schema:
-          $ref: '#/definitions/handler.addProductToCart'
+        type: integer
+      - description: Quantity of product
+        in: query
+        name: quantity
+        required: true
+        type: integer
       produces:
       - application/json
       responses: {}
@@ -176,12 +118,25 @@ paths:
       - application/json
       description: add product to database
       parameters:
-      - description: NewProduct
-        in: body
-        name: product
+      - description: product name
+        in: query
+        name: name
         required: true
-        schema:
-          $ref: '#/definitions/handler.addProduct'
+        type: string
+      - description: price for product
+        in: query
+        name: cost
+        required: true
+        type: number
+      - description: product description
+        in: query
+        name: description
+        type: string
+      - description: amount of product
+        in: query
+        name: amount
+        required: true
+        type: integer
       produces:
       - application/json
       responses: {}
@@ -257,12 +212,16 @@ paths:
       - application/json
       description: delete user or change user acc to inactive
       parameters:
-      - description: User data
-        in: body
-        name: data
+      - description: your login
+        in: query
+        name: login
         required: true
-        schema:
-          $ref: '#/definitions/handler.deleteAccount'
+        type: string
+      - description: your password
+        in: query
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses: {}
@@ -308,12 +267,11 @@ paths:
         name: id
         required: true
         type: integer
-      - description: NewBalance
-        in: body
+      - description: how many money do you want add/receive(type with -)
+        in: query
         name: balance
         required: true
-        schema:
-          $ref: '#/definitions/handler.changeBalance'
+        type: number
       produces:
       - application/json
       responses: {}
@@ -322,18 +280,51 @@ paths:
       summary: Update user
       tags:
       - users
+  /api/users/link/{service}:
+    post:
+      consumes:
+      - application/json
+      description: link your account with another service
+      parameters:
+      - description: service
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: your login
+        in: query
+        name: login
+        required: true
+        type: string
+      - description: your password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: link account
+      tags:
+      - users
   /auth/sign-in:
     post:
       consumes:
       - application/json
       description: login
       parameters:
-      - description: account info
-        in: body
-        name: input
+      - description: your login
+        in: query
+        name: login
         required: true
-        schema:
-          $ref: '#/definitions/handler.signInInput'
+        type: string
+      - description: your password
+        in: query
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses: {}
@@ -346,12 +337,21 @@ paths:
       - application/json
       description: create account
       parameters:
-      - description: reg input
-        in: body
-        name: input
+      - description: your login
+        in: query
+        name: login
         required: true
-        schema:
-          $ref: '#/definitions/handler.signUp'
+        type: string
+      - description: your password
+        in: query
+        name: password
+        required: true
+        type: string
+      - description: your email
+        in: query
+        name: email
+        required: true
+        type: string
       produces:
       - application/json
       responses: {}

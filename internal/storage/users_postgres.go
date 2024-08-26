@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"onlineshop/internal/models"
+	"onlineshop/pkg/util/logger"
 )
 
 type UsersPostgres struct {
@@ -76,3 +77,29 @@ func (u *UsersPostgres) DeleteAccount(id int, login string, password string) err
 	}
 	return nil
 }
+
+func (u *UsersPostgres) AddConnection(userID, serviceID int, service string) error {
+	query := fmt.Sprintf("INSERT INTO %s (user_id, service, service_id) values ($1, $2, $3)", connectionTable)
+	_, err := u.db.Exec(query, userID, service, serviceID)
+	if err != nil{
+		return fmt.Errorf("error during adding connection: %w", err)
+	}
+	logger.Logger.Info("connection is created")
+	return nil
+}
+
+type Connection struct{
+	UserID int `db:"user_id"`
+	ServiceName string `db:"service"`
+	ServiceID int `db:"service_id"`
+}
+func (u *UsersPostgres) GetConnections(userID int) ([]Connection,error){
+	var conn []Connection
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id=$1", connectionTable)
+	err := u.db.Select(&conn, query, userID)
+	if err != nil {
+		return conn, fmt.Errorf("error during getting connection: %w", err)
+	}
+	return conn, nil
+}
+
