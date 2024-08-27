@@ -33,7 +33,6 @@ func (h *Handler) checkCart(c *gin.Context) {
 		return
 	}
 	cartItems, err := h.Crt.GetCart(userid)
-	cartItems, err := h.services.GetCart(userid)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

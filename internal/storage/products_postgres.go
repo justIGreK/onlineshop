@@ -79,11 +79,7 @@ func (p *ProductsPostgres) DeleteProductById(id int) error {
 
 func (p *ProductsPostgres) UpdateProduct(id int, product models.UpdateProduct) error {
 	var exists bool
-	logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	exists, err = p.CheckForExisting(id, productsTable)
+	exists, err := p.CheckForExisting(id, productsTable)
 	if err != nil {
 		return err
 	}
