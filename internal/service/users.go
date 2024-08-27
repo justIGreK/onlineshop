@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"net/http"
 
-
 	"onlineshop/internal/models"
 	"onlineshop/internal/storage"
+	"onlineshop/pkg/util/logger"
 )
 
 type UserList interface {
@@ -84,6 +84,7 @@ func (u *UserService) LinkAccount(id int, login, password, srv string) error {
 	switch srv {
 	case "joker":
 		url = joker
+		logger.Logger.Info(url)
 	default:
 		return fmt.Errorf("no such service")
 	}
@@ -101,7 +102,7 @@ func (u *UserService) LinkAccount(id int, login, password, srv string) error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal account data: %w", err)
 	}
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post(joker, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}

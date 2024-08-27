@@ -1,6 +1,6 @@
 package models
 
-type Payload struct{
-	ServiceID int 
-	Price float64
+type Payload struct {
+	ServiceID int
+	Price     float64
 }

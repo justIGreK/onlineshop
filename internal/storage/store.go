@@ -45,10 +45,10 @@ import "github.com/jmoiron/sqlx"
 
 type Store struct {
 	Authorization *AuthPostgres
-	UserList *UsersPostgres
-	Product *ProductsPostgres
-	Cart *CartPostgres
-	Order *OrderPostgres
+	UserList      *UsersPostgres
+	Product       *ProductsPostgres
+	Cart          *CartPostgres
+	Order         *OrderPostgres
 }
 
 func NewStore(db *sqlx.DB) *Store {
