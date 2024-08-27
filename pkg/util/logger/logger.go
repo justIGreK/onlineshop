@@ -17,5 +17,7 @@ func InitLogger() {
 }
 
 func CloseLogger() {
-	_ = Logger.Sync()
+	if err := Logger.Sync(); err != nil {
+		Logger.Fatal("failed to sync logger: %v", zap.String("error", err.Error()))
+	}
 }

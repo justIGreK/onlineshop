@@ -2,12 +2,13 @@ package publisher
 
 import (
 	"encoding/json"
-	"onlineshop/internal/models"
-	"onlineshop/internal/storage"
-	"onlineshop/pkg/util/logger"
 
 	"github.com/nats-io/nats.go"
 	"go.uber.org/zap"
+
+	"onlineshop/internal/models"
+	"onlineshop/internal/storage"
+	"onlineshop/pkg/util/logger"
 )
 
 type NATSMessageSender struct {
@@ -33,9 +34,12 @@ func (sender *NATSMessageSender) SendMessage(userID int, orderCost float64) {
 			ServiceID: conn.ServiceID,
 			Price:     orderCost,
 		}
-		data, _ := json.Marshal(pl)
+		data, err := json.Marshal(pl)
+		if err != nil {
+			logger.Logger.Info("error during marshal data: %v", zap.String("error", err.Error()))
+		}
 
-		err := sender.nc.Publish(conn.ServiceName, data)
+		err = sender.nc.Publish(conn.ServiceName, data)
 		if err != nil {
 			logger.Logger.Info("error sending request: %v", zap.String("error", err.Error()))
 		}
