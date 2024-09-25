@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-redis/redis"
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -11,6 +12,7 @@ import (
 	"onlineshop/internal"
 	"onlineshop/internal/service"
 	"onlineshop/internal/storage"
+	"onlineshop/internal/ws"
 	grpcrequest "onlineshop/pkg/grpcReq"
 	"onlineshop/pkg/publisher"
 	"onlineshop/pkg/util/logger"
@@ -26,7 +28,6 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-
 func main() {
 	logger.InitLogger()
 	defer logger.CloseLogger()
@@ -56,24 +57,30 @@ func main() {
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			// Обработка ошибки, например логирование
 			logger.Logger.Fatal("failed to close connection: %v", zap.String("error", err.Error()))
 		}
 	}()
 	grpcSender := grpcrequest.NewGrpcRequst(conn)
-	// repos := storage.NewAuthPostgres(db)
 	repos := storage.NewStore(db)
 	natsSender := publisher.NewNATSMessageSender(nc, repos.UserList)
-	handler := handler.Handler{
-		Auth: service.NewAuthService(repos.Authorization, *grpcSender),
-		Prod: service.NewProdService(repos.Product),
-		User: service.NewUserService(repos.UserList),
-		Crt:  service.NewCartService(natsSender, repos.Cart, repos.Product, repos.Order, repos.UserList),
-		Ord:  service.NewOrderService(repos.Order),
-	}
-
+	userList := service.NewUserService(repos.UserList)
+	shopHandler := handler.NewHandler(
+		service.NewAuthService(repos.Authorization, *grpcSender),
+		userList,
+		service.NewProdService(repos.Product),
+		service.NewCartService(natsSender, repos.Cart, repos.Product, repos.Order, repos.UserList),
+		service.NewOrderService(repos.Order),
+	)
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	hub := ws.NewHub(rdb)
+	wsHandler := ws.NewHandler(hub, userList)
+	go hub.Run()
 	srv := new(internal.Server)
-	if err := srv.Run(viper.GetString("port"), handler.InitRoutes()); err != nil {
+	if err := srv.Run(viper.GetString("port"), handler.InitRoutes(shopHandler, wsHandler)); err != nil {
 		logger.Logger.Fatal("error until running server: %s", zap.String("error", err.Error()))
 	}
 }
