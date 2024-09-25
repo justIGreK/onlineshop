@@ -6,4 +6,6 @@ linter:
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.59.1 run -v
 migrate down:
 	migrate -path ./schema -database 'postgres://postgres:secret@localhost:5555/postgres?sslmode=disable' down 
+redis:
+	docker run --name msg-storage -p 6379:6379 -d redis 
 .PHONY: migrateup, migratedown
